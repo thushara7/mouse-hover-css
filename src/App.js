@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 export default function App() {
   const [state, setState] = useState(null);
   const [info, setInfo] = useState("");
+  const [selected, setSelected] = useState("profile");
 
   const getResults = async function() {
     const data = await fetch("https://randomuser.me/api/?seed=thushara");
@@ -15,10 +16,23 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (state && state["name"]["title"]) {
+      setInfo(
+        state["name"]["title"] +
+          " " +
+          state["name"]["first"] +
+          " " +
+          state["name"]["last"]
+      );
+    }
+  }, [state]);
+
+  useEffect(() => {
     getResults();
   }, []);
 
   function handleMouseEnter(e) {
+    setSelected(e.target.name);
     let displayValue = "";
     if (e.target.name === "profile") {
       displayValue =
@@ -30,50 +44,48 @@ export default function App() {
     } else if (e.target.name === "email") {
       displayValue = state["email"];
     } else if (e.target.name === "address") {
-      // address
+      displayValue = state["location"]["city"];
     }
 
     setInfo(displayValue);
-
     console.log(e.target.name);
   }
 
-  function handleMouseLeave(e) {
-    setInfo("");
-  }
   return (
     <div className="App">
       {state && state.picture && (
-        <div className="card">
+        <div className="card ">
           <img
             src={state?.picture.large}
             className="avatar"
             alt="profilePicture"
           />
           <p className="line"></p>
+          <p className="helperInfo"> {`My ${selected} is`}</p>
           <p> {info ? info : ""}</p>
           <div className="main">
             <button
-              className="icon"
+              className={
+                info && selected === "profile" ? "invertedIcon" : "icon"
+              }
               onMouseEnter={handleMouseEnter}
               name="profile"
-              onMouseLeave={handleMouseLeave}
             >
               Profile
             </button>
             <button
-              className="icon"
+              className={info && selected === "email" ? "invertedIcon" : "icon"}
               name="email"
               onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
             >
               Email
             </button>
             <button
-              className="icon"
+              className={
+                info && selected === "address" ? "invertedIcon" : "icon"
+              }
               name="address"
               onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
             >
               Address
             </button>
